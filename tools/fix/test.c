@@ -274,7 +274,7 @@ void fprintmsg(FILE *stream, struct fix_message *msg)
 {
 	char buf[FIX_MAX_LINE_LENGTH];
 	struct fix_field *field;
-	int size = sizeof buf;
+	int size = FIX_MAX_LINE_LENGTH;
 	char delim = '|';
 	int len = 0;
 	int i;

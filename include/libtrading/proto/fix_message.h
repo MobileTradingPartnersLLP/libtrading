@@ -48,6 +48,11 @@ enum fix_msg_type {
 	FIX_MSG_ORDER_MASS_STATUS_REQUEST	= 25,
 	FIX_MSG_ORDER_MASS_ACTION_REQUEST	= 26,
 	FIX_MSG_ORDER_MASS_ACTION_REPORT	= 27,
+	
+	/* added by MTP */
+	FIX_MSG_MARKET_DATA_REQUEST	= 28,
+	FIX_MSG_MARKET_DATA_REJECT	= 29,
+	/* ends */
 
 	FIX_MSG_TYPE_MAX,		/* non-API */
 
@@ -58,11 +63,11 @@ enum fix_msg_type {
  * Maximum FIX message size
  */
 #define FIX_MAX_HEAD_LEN	256UL
-#define FIX_MAX_BODY_LEN	1024UL
+#define FIX_MAX_BODY_LEN	2048UL
 #define FIX_MAX_MESSAGE_SIZE	(FIX_MAX_HEAD_LEN + FIX_MAX_BODY_LEN)
 
 /* Total number of elements of fix_tag type*/
-#define FIX_MAX_FIELD_NUMBER	48
+#define FIX_MAX_FIELD_NUMBER	128
 
 #define	FIX_MSG_STATE_PARTIAL	1
 #define	FIX_MSG_STATE_GARBLED	2

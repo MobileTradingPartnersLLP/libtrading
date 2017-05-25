@@ -1,5 +1,5 @@
 #define	FIX_MAX_ELEMENTS_NUMBER	32
-#define	FIX_MAX_LINE_LENGTH	256
+#define	FIX_MAX_LINE_LENGTH	1024
 
 struct felem {
 	struct fix_message msg;

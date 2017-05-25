@@ -48,6 +48,8 @@ const char *fix_msg_types[FIX_MSG_TYPE_MAX] = {
 	[FIX_MSG_ORDER_MASS_STATUS_REQUEST]	= "AF",
 	[FIX_MSG_ORDER_MASS_ACTION_REQUEST]	= "CA",
 	[FIX_MSG_ORDER_MASS_ACTION_REPORT]	= "BZ",
+	[FIX_MSG_MARKET_DATA_REQUEST]	= "V",
+	[FIX_MSG_MARKET_DATA_REJECT]	= "Y",
 };
 
 enum fix_msg_type fix_msg_type_parse(const char *s, const char delim)
@@ -90,6 +92,8 @@ enum fix_msg_type fix_msg_type_parse(const char *s, const char delim)
 	case 'Z': return FIX_MSG_QUOTE_CANCEL;
 	case 'd': return FIX_MSG_SECURITY_DEFINITION;
 	case 'b': return FIX_MSG_QUOTE_ACKNOWLEDGEMENT;
+	case 'V': return FIX_MSG_MARKET_DATA_REQUEST;
+	case 'Y': return FIX_MSG_MARKET_DATA_REJECT;
 	default : return FIX_MSG_TYPE_UNKNOWN;
 	}
 }

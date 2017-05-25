@@ -1,0 +1,55 @@
+
+24 May 2017
+
+
+tools/fix/fix_client.c
+----------------------
+
+- correct logic inversion to eliminate segfault in session mode
+
+- modify session mode so it subscribes to market data and loops printing the received data (to do: create separate market data mode)
+
+- add new parameter "i" to allow list of instrument IDs/symbols to be specified for this
+
+
+tools/fix/fix_common.c
+----------------------
+
+- send session->sender_comp_id as username (tag 553) in logon message (to do: make this separate & optional param)
+
+
+tools/fix/test.h
+----------------
+
+- increase FIX_MAX_LINE_LENGTH to 1024
+
+
+fix_message.h & fix_message.c
+-----------------------------
+
+- increase FIX_MAX_FIELD_NUMBER to 128 to resolve buffer write issues (array overruns)
+
+- added message types FIX_MSG_MARKET_DATA_REQUEST and FIX_MSG_MARKET_DATA_REJECT
+
+
+
+example usage
+-------------
+
+connecting to LMAX Demo account for market data (4 instruments) via stunnel (bash script)
+
+
+cd ~/libtrading/tools/fix/
+echo "starting stunnel"
+stunnel -D 7 -O l:SO_LINGER=1:60 -O r:TCP_NODELAY=1 -c -d 40003 -f -r fix-marketdata.london-demo.lmax.com:443 -P ${PIDFILE} &
+sleep 5
+echo "starting FIX client"
+ulimit -c unlimited && valgrind ./fix_client\
+	-h "localhost"\
+	-p 40003\
+	-s ${USERNAME}\
+	-t LMXBDM\
+	-r ${PASSWORD}\
+	-d fix44\
+	-m session\
+	-i 4003+100483+100928+100925

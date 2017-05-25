@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "test.h"
+
 bool fix_session_keepalive(struct fix_session *session, struct timespec *now)
 {
 	int diff;
@@ -206,6 +208,7 @@ int fix_session_logon(struct fix_session *session)
 		FIX_INT_FIELD(EncryptMethod, 0),
 		FIX_STRING_FIELD(ResetSeqNumFlag, "Y"),
 		FIX_INT_FIELD(HeartBtInt, session->heartbtint),
+		FIX_STRING_FIELD(553, session->sender_comp_id),
 		FIX_STRING_FIELD(Password, session->password),
 	};
 
@@ -217,7 +220,10 @@ int fix_session_logon(struct fix_session *session)
 
 	if (!session->password || !strlen(session->password))
 		logon_msg.nr_fields--;
-
+	if (!session->sender_comp_id || !strlen(session->sender_comp_id))
+		logon_msg.nr_fields--;
+	
+	fprintmsg(stdout, &logon_msg);
 	fix_session_send(session, &logon_msg, 0);
 	session->active = true;
 

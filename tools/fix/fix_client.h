@@ -7,6 +7,7 @@ enum fix_client_mode {
 struct fix_client_arg {
 	const char *script;
 	const char *output;
+	const char *instrument_ids;
 	int orders;
 	int warmup_orders;
 };
@@ -19,3 +20,5 @@ struct fix_client_function {
 static int fix_client_session(struct fix_session_cfg *cfg, struct fix_client_arg *arg);
 static int fix_client_script(struct fix_session_cfg *cfg, struct fix_client_arg *arg);
 static int fix_client_order(struct fix_session_cfg *cfg, struct fix_client_arg *arg);
+
+static int fix_session_subscribe(struct fix_session *session, const char *market_id);

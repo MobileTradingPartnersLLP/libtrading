@@ -193,6 +193,34 @@ exit:
 	return ret;
 }
 
+
+int fix_session_subscribe(struct fix_session *session, const char *market_id)
+{
+	struct fix_message sub_msg;
+	struct fix_field fields[] = {
+		FIX_STRING_FIELD(262, market_id),
+		FIX_CHAR_FIELD(263, '1'),
+		FIX_INT_FIELD(264, 0),
+		FIX_INT_FIELD(265, 0),
+		FIX_INT_FIELD(267, 2),
+		FIX_CHAR_FIELD(269, '0'),
+		FIX_CHAR_FIELD(269, '1'),
+		FIX_INT_FIELD(146, 1),
+		FIX_STRING_FIELD(48, market_id),
+		FIX_STRING_FIELD(22, "8"),
+	};
+	
+	sub_msg	= (struct fix_message) {
+		.type		= FIX_MSG_MARKET_DATA_REQUEST,
+		.nr_fields	= ARRAY_SIZE(fields),
+		.fields		= fields,
+	};
+
+	fix_session_send(session, &sub_msg, 0);
+
+	return 0;
+}
+
 static int fix_client_session(struct fix_session_cfg *cfg, struct fix_client_arg *arg)
 {
 	struct fix_session *session = NULL;
@@ -220,6 +248,27 @@ static int fix_client_session(struct fix_session_cfg *cfg, struct fix_client_arg
 
 	fprintf(stdout, "Client Logon OK\n");
 
+	const char seps[]   = ",+";
+	char *symbol;
+	
+	if (arg && arg->instrument_ids) {
+		char *instrument_ids   = malloc (1 + strlen (arg->instrument_ids));
+		strcpy (instrument_ids, arg->instrument_ids);
+	    symbol = strtok( instrument_ids, seps );
+	    while( symbol != NULL )
+	    {
+	        /* While there are tokens in "string" */
+			ret = fix_session_subscribe(session, symbol);
+			if (ret) {
+				fprintf(stderr, "Subscription FAILED\n");
+				goto exit;
+			}
+			fprintf(stdout, "Subscribed %s\n", symbol);
+	        /* Get next token: */
+	        symbol = strtok( NULL, seps );
+	    }
+	}
+
 	clock_gettime(CLOCK_MONOTONIC, &prev);
 
 	while (!stop && session->active) {
@@ -240,9 +289,8 @@ static int fix_client_session(struct fix_session_cfg *cfg, struct fix_client_arg
 			break;
 		}
 
-		if (fix_session_recv(session, &msg, FIX_RECV_FLAG_MSG_DONTWAIT) <= 0) {
+		if (fix_session_recv(session, &msg, FIX_RECV_FLAG_MSG_DONTWAIT) > 0) {
 			fprintmsg(stdout, msg);
-
 			if (fix_session_admin(session, msg))
 				continue;
 
@@ -251,7 +299,7 @@ static int fix_client_session(struct fix_session_cfg *cfg, struct fix_client_arg
 				stop = 1;
 				break;
 			default:
-				stop = 1;
+				stop = 0;
 				break;
 			}
 		}
@@ -408,7 +456,7 @@ exit:
 
 static void usage(void)
 {
-	printf("\n usage: %s [-m mode] [-d dialect] [-f filename] [-n orders] [-s sender-comp-id] [-t target-comp-id] [-r password] [-w warmup orders] -h hostname -p port\n\n", program);
+	printf("\n usage: %s [-m mode] [-d dialect] [-f filename] [-n orders] [-s sender-comp-id] [-t target-comp-id] [-r password] [-w warmup orders] [-i instrument-ids] -h hostname -p port\n\n", program);
 
 	exit(EXIT_FAILURE);
 }
@@ -476,7 +524,7 @@ int main(int argc, char *argv[])
 
 	program = basename(argv[0]);
 
-	while ((opt = getopt(argc, argv, "f:h:p:d:s:t:m:n:o:r:w:")) != -1) {
+	while ((opt = getopt(argc, argv, "f:h:p:d:s:t:m:n:o:r:w:i:")) != -1) {
 		switch (opt) {
 		case 'd':
 			version = strversion(optarg);
@@ -510,6 +558,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'w':
 			arg.warmup_orders = atoi(optarg);
+			break;
+		case 'i':
+			arg.instrument_ids = optarg;
 			break;
 		default: /* '?' */
 			usage();
@@ -583,7 +634,7 @@ int main(int argc, char *argv[])
 		ret = fix_client_functions[mode].fix_session_initiate(&cfg, &arg);
 		break;
 	case FIX_CLIENT_SESSION:
-		ret = fix_client_functions[mode].fix_session_initiate(&cfg, NULL);
+		ret = fix_client_functions[mode].fix_session_initiate(&cfg, &arg);
 		break;
 	default:
 		error("Invalid mode");

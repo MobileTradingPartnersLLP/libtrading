@@ -116,10 +116,12 @@ endif
 
 market_EXTRA_DEPS += lib/die.o
 market_EXTRA_DEPS += tools/sim/engine.o
+market_EXTRA_DEPS += tools/fix/test.o
 market_EXTRA_DEPS += tools/fix/fix_common.o
 market_EXTRA_LIBS += -lm
 
 trader_EXTRA_DEPS += lib/die.o
+trader_EXTRA_DEPS += tools/fix/test.o
 trader_EXTRA_DEPS += tools/fix/fix_common.o
 
 fix_client_EXTRA_DEPS += lib/die.o
@@ -142,6 +144,7 @@ fast_parser_EXTRA_DEPS += lib/die.o
 fast_parser_EXTRA_DEPS += tools/fast/test.o
 
 forts_EXTRA_DEPS += lib/die.o
+forts_EXTRA_DEPS += tools/fix/test.o
 forts_EXTRA_DEPS += tools/fix/fix_common.o
 
 tape_EXTRA_DEPS += tools/tape/builtin-check.o
