@@ -289,7 +289,7 @@ static int fix_client_session(struct fix_session_cfg *cfg, struct fix_client_arg
 			break;
 		}
 
-		if (fix_session_recv(session, &msg, FIX_RECV_FLAG_MSG_DONTWAIT) > 0) {
+		if (fix_session_recv(session, &msg, 0 /* FIX_RECV_FLAG_MSG_DONTWAIT */) > 0) {
 			fprintmsg(stdout, msg);
 			if (fix_session_admin(session, msg))
 				continue;
